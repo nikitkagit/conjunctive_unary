@@ -11,19 +11,21 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 add_library(conjuctive_unary_library
-    src/equation.cpp
-    src/intersection_expression.cpp
-    src/sum_expression.cpp
-    src/union_expression.cpp
-    src/variable_expression.cpp
-    src/expression_proxy.cpp
-    src/constant_expression.cpp
-    src/equation_calculator.cpp
-    src/variable_dictionary.cpp
-    src/parser.cpp
-    src/options.cpp
-    src/result_printer.cpp
-    src/application.cpp
+    src/application/application.cpp
+    src/application/options.cpp
+    src/application/result_printer.cpp
+
+    src/equation/equation.cpp
+    src/equation/equation_calculator.cpp
+    src/equation/parser.cpp
+    src/equation/variable_dictionary.cpp
+
+    src/expression/intersection_expression.cpp
+    src/expression/sum_expression.cpp
+    src/expression/union_expression.cpp
+    src/expression/variable_expression.cpp
+    src/expression/expression_proxy.cpp
+    src/expression/constant_expression.cpp
 )
 target_include_directories(conjuctive_unary_library PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/CU

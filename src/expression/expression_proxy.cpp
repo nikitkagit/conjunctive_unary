@@ -1,4 +1,4 @@
-#include "expression_proxy.hpp"
+#include "expression/expression_proxy.hpp"
 
 ExpressionProxy::ExpressionProxy(const Expression *target)
     : m_target(target)

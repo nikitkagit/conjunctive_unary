@@ -1,9 +1,10 @@
-#include "application.hpp"
+#include "application/application.hpp"
 
-#include "equation_calculator.hpp"
-#include "options.hpp"
-#include "parser.hpp"
-#include "result_printer.hpp"
+#include "application/options.hpp"
+#include "application/result_printer.hpp"
+
+#include "equation/equation_calculator.hpp"
+#include "equation/parser.hpp"
 
 #include <fstream>
 #include <string>

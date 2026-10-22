@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "CU/application.hpp"
+#include "application/application.hpp"
 
 int main(int argc, char **argv)
 {

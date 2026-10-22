@@ -3,10 +3,11 @@
 #include <string>
 #include <cassert>
 
-#include "CU/equation.hpp"
-#include "CU/equation_calculator.hpp"
-#include "CU/parser.hpp"
-#include "CU/variable_expression.hpp"
+#include "equation/equation.hpp"
+#include "equation/equation_calculator.hpp"
+#include "equation/parser.hpp"
+
+#include "expression/variable_expression.hpp"
 
 namespace
 {

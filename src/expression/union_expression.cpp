@@ -1,4 +1,4 @@
-#include "union_expression.hpp"
+#include "expression/union_expression.hpp"
 
 UnionExpression::UnionExpression(std::vector<std::unique_ptr<Expression>> operands)
     : m_operands(std::move(operands))

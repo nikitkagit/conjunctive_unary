@@ -5,12 +5,12 @@
 #include <utility>
 #include <vector>
 
-#include "CU/constant_expression.hpp"
-#include "CU/expression_proxy.hpp"
-#include "CU/intersection_expression.hpp"
-#include "CU/sum_expression.hpp"
-#include "CU/union_expression.hpp"
-#include "CU/variable_expression.hpp"
+#include "expression/constant_expression.hpp"
+#include "expression/expression_proxy.hpp"
+#include "expression/intersection_expression.hpp"
+#include "expression/sum_expression.hpp"
+#include "expression/union_expression.hpp"
+#include "expression/variable_expression.hpp"
 
 namespace
 {

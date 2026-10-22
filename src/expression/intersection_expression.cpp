@@ -1,11 +1,11 @@
-#include "sum_expression.hpp"
+#include "expression/intersection_expression.hpp"
 
-SumExpression::SumExpression(std::vector<std::unique_ptr<Expression>> operands)
+IntersectionExpression::IntersectionExpression(std::vector<std::unique_ptr<Expression>> operands)
     : m_operands(std::move(operands))
 {
 }
 
-data_t SumExpression::calculate() const
+data_t IntersectionExpression::calculate() const
 {
     if (m_operands.empty())
     {
@@ -17,14 +17,18 @@ data_t SumExpression::calculate() const
     {
         const data_t part = m_operands[i]->calculate();
         data_t next;
-        for (const num_t &lhs : result)
+        for (const num_t &value : result)
         {
-            for (const num_t &rhs : part)
+            if (part.find(value) != part.end())
             {
-                next.insert(lhs + rhs);
+                next.insert(value);
             }
         }
         result = std::move(next);
+        if (result.empty())
+        {
+            break;
+        }
     }
     return result;
 }

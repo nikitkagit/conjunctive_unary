@@ -1,6 +1,6 @@
-#include "equation.hpp"
+#include "equation/equation.hpp"
 
-#include "variable_expression.hpp"
+#include "expression/variable_expression.hpp"
 
 Equation::Equation(std::unique_ptr<Expression> expression)
     : m_expression(std::move(expression))

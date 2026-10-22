@@ -6,7 +6,7 @@
 #include <string>
 #include <vector>
 
-#include "CU/application.hpp"
+#include "application/application.hpp"
 
 namespace
 {

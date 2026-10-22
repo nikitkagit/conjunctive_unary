@@ -3,8 +3,9 @@
 
 #include "common.hpp"
 
-#include "expression.hpp"
-#include "variable_dictionary.hpp"
+#include "equation/variable_dictionary.hpp"
+
+#include "expression/expression.hpp"
 
 class Equation;
 class EquationCalculator;
