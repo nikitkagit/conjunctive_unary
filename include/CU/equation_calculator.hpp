@@ -17,6 +17,18 @@ class Equation;
 class EquationCalculator
 {
 public:
+    EquationCalculator();
+    
+    ~EquationCalculator();
+    
+    EquationCalculator(const EquationCalculator &) = delete;
+    
+    EquationCalculator &operator=(const EquationCalculator &) = delete;
+    
+    EquationCalculator(EquationCalculator &&) noexcept;
+    
+    EquationCalculator &operator=(EquationCalculator &&) noexcept;
+
     /**
      * @brief Creates and owns a new variable.
      * @return Non-owning pointer to the created variable.

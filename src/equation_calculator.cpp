@@ -3,6 +3,11 @@
 #include "equation.hpp"
 #include "variable_expression.hpp"
 
+EquationCalculator::EquationCalculator() = default;
+EquationCalculator::~EquationCalculator() = default;
+EquationCalculator::EquationCalculator(EquationCalculator &&) noexcept = default;
+EquationCalculator &EquationCalculator::operator=(EquationCalculator &&) noexcept = default;
+
 VariableExpression *EquationCalculator::add_variable()
 {
     m_variables.push_back(std::make_unique<VariableExpression>());
