@@ -264,7 +264,7 @@ int main()
         assert(throws_runtime_error([&] { parser.parse_equation("A = {1, }"); }));
         assert(throws_runtime_error([&] { parser.parse_equation("A = {1 2}"); }));
         assert(throws_runtime_error([&] { parser.parse_equation("A = {x}"); }));
-        assert(throws_runtime_error([&] { parser.parse_equation("A = ( {1} ")}; ));
+        assert(throws_runtime_error([&] { parser.parse_equation("A = ( {1} "); } ));
         assert(throws_runtime_error([&] { parser.parse_equation("A = & {1}"); }));
         assert(throws_runtime_error([&] { parser.parse_equation("A = {1} extra"); }));
         assert(throws_runtime_error([&] { parser.parse_equation("A = {1} +"); }));

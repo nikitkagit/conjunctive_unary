@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 
-project(conjuctive_unary LANGUAGES CXX)
+project(conjunctive_unary LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -10,7 +10,7 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
 endif()
 
-add_library(conjuctive_unary_library
+add_library(conjunctive_unary_library
     src/application/application.cpp
     src/application/options.cpp
     src/application/result_printer.cpp
@@ -27,7 +27,7 @@ add_library(conjuctive_unary_library
     src/expression/expression_proxy.cpp
     src/expression/constant_expression.cpp
 )
-target_include_directories(conjuctive_unary_library PUBLIC
+target_include_directories(conjunctive_unary_library PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/CU
     ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
@@ -35,13 +35,13 @@ target_include_directories(conjuctive_unary_library PUBLIC
 add_executable(gcu
     src/main.cpp
 )
-target_link_libraries(gcu PRIVATE conjuctive_unary_library)
+target_link_libraries(gcu PRIVATE conjunctive_unary_library)
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
-    target_compile_options(conjuctive_unary_library PRIVATE -Wall -Wextra -Wpedantic)
+    target_compile_options(conjunctive_unary_library PRIVATE -Wall -Wextra -Wpedantic)
     target_compile_options(gcu PRIVATE -Wall -Wextra -Wpedantic)
 elseif(MSVC)
-    target_compile_options(conjuctive_unary_library PRIVATE /W4)
+    target_compile_options(conjunctive_unary_library PRIVATE /W4)
     target_compile_options(gcu PRIVATE /W4)
 endif()
 
@@ -52,7 +52,7 @@ enable_testing()
 function(add_project_test source)
     get_filename_component(name "${source}" NAME_WE)
     add_executable(${name} ${source})
-    target_link_libraries(${name} PRIVATE conjuctive_unary_library)
+    target_link_libraries(${name} PRIVATE conjunctive_unary_library)
     add_test(NAME ${name} COMMAND ${name})
 endfunction()
 
