@@ -77,6 +77,19 @@ B = (A + {1}) & {2, 3, 4, 5}
 C = ({1, 2} + {3}) | (A & B) | {10}
 ```
 
+## Variable names
+
+Variable names follow standard C identifier rules:
+
+- the first character must be a letter (`A–Z`, `a–z`) or underscore `_`;
+- subsequent characters may be letters, digits (`0–9`) or underscore `_`;
+- names are case-sensitive (`A` and `a` are different variables);
+- no length limit;
+- Cyrillic letters, spaces, hyphens and other symbols are not allowed;
+- reserved words are not checked, so names like `if` or `_` are valid.
+
+Valid examples: `A`, `foo_bar`, `_tmp`, `x1`, `Counter2024`.
+
 ## Output format
 
 The output lists every variable defined in the system, one per line,
@@ -111,6 +124,44 @@ A = { 1 2 }
 B = { 1 2 3 }
 C = { 2 3 }
 ```
+
+## Behavior on invalid input
+
+Parsing is strict and fails on the first malformed line. Specifically:
+
+- **Blank and whitespace-only lines are skipped** — they do not count as equations.
+- **A syntax error aborts the whole run.** The application prints a message of the form  
+  `Parse error on line N: <reason>` to `stderr` and exits with a non-zero status.
+  Neither the input file nor the output file is processed further, and the
+  output file is **not** written (any pre-existing file with that name is left
+  untouched only if it was not opened yet — in practice the output is opened
+  only after successful parsing, so it is not created at all).
+- **No partial system is built.** If the input has three equations and the
+  second one is broken, the first equation is discarded and no iteration is
+  performed.
+- **The LHS variable of a failed equation is not created.** For example, in  
+  `A = B &` the `&` operator is missing its right operand, so `A` is not
+  registered in the dictionary. Variables that appear on the right-hand side
+  are created eagerly during expression parsing, so `B` in that example *would*
+  have been created before the error was detected — this is the only observable
+  side effect of a failed parse.
+- **Unknown characters, missing operands, unbalanced parentheses,
+  malformed fixed sets and trailing input** all trigger a syntax error. Examples
+  that fail to parse:
+
+  ```text
+  A
+  A =
+  = {1}
+  A = {1
+  A = {1, }
+  A = {1 2}
+  A = {x}
+  A = ( {1}
+  A = & {1}
+  A = {1} + 
+  A = {1} extra
+  ```
 
 ### Core classes
 
