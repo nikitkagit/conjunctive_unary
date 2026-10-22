@@ -3,22 +3,27 @@
 
 #include "expression.hpp"
 
+#include <memory>
+#include <vector>
+
 /**
  * @brief Union of an arbitrary number of set expressions.
+ *
+ * Owns its operands.
  */
 class UnionExpression : public Expression
 {
 public:
     /**
      * @brief Constructs a union of the given operands.
-     * @param operands Non-owning pointers to operand expressions.
+     * @param operands Owning pointers to operand expressions.
      */
-    explicit UnionExpression(std::vector<const Expression *> operands);
+    explicit UnionExpression(std::vector<std::unique_ptr<Expression>> operands);
 
     data_t calculate() const override;
 
 private:
-    std::vector<const Expression *> m_operands;
+    std::vector<std::unique_ptr<Expression>> m_operands;
 };
 
 #endif // UNION_EXPRESSION_HPP

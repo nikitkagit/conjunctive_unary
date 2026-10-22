@@ -1,6 +1,6 @@
 #include "sum_expression.hpp"
 
-SumExpression::SumExpression(std::vector<const Expression *> operands)
+SumExpression::SumExpression(std::vector<std::unique_ptr<Expression>> operands)
     : m_operands(std::move(operands))
 {
 }

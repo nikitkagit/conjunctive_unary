@@ -1,6 +1,6 @@
 #include "intersection_expression.hpp"
 
-IntersectionExpression::IntersectionExpression(std::vector<const Expression *> operands)
+IntersectionExpression::IntersectionExpression(std::vector<std::unique_ptr<Expression>> operands)
     : m_operands(std::move(operands))
 {
 }
