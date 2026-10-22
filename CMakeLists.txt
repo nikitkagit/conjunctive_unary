@@ -49,13 +49,13 @@ add_library(conjunctive_unary_library
 )
 
 target_include_directories(conjunctive_unary_library PRIVATE
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/CU
 )
 
 target_include_directories(conjunctive_unary_library PUBLIC
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/CU>
-    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/CU>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 
 # --- Example application ---
@@ -88,6 +88,10 @@ if(CONJUNCTIVE_UNARY_BUILD_TESTS)
         get_filename_component(name "${source}" NAME_WE)
         add_executable(${name} ${source})
         target_link_libraries(${name} PRIVATE conjunctive_unary_library)
+        target_include_directories(${name} PRIVATE
+            ${CMAKE_CURRENT_SOURCE_DIR}/include
+            ${CMAKE_CURRENT_SOURCE_DIR}/include/CU
+        )
         add_test(NAME ${name} COMMAND ${name})
     endfunction()
 

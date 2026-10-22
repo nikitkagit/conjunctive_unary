@@ -11,10 +11,6 @@
 #include <string>
 #include <vector>
 
-/// Numeric type used for elements of the sets.
-using num_t = unsigned long long;
-
-/// Container type used for set values.
-using data_t = std::set<num_t>;
+#include "types.hpp"
 
 #endif // COMMON_HPP
