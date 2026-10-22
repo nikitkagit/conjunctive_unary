@@ -19,6 +19,8 @@ add_library(conjuctive_unary_library
     src/expression_proxy.cpp
     src/constant_expression.cpp
     src/equation_calculator.cpp
+    src/variable_dictionary.cpp
+    src/parser.cpp
 )
 target_include_directories(conjuctive_unary_library PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/CU
@@ -51,3 +53,9 @@ add_executable(equation_calculator_test
 )
 target_link_libraries(equation_calculator_test PRIVATE conjuctive_unary_library)
 add_test(NAME equation_calculator_test COMMAND equation_calculator_test)
+
+add_executable(parser_test
+    test/parser_test.cpp
+)
+target_link_libraries(parser_test PRIVATE conjuctive_unary_library)
+add_test(NAME parser_test COMMAND parser_test)
