@@ -21,6 +21,9 @@ add_library(conjuctive_unary_library
     src/equation_calculator.cpp
     src/variable_dictionary.cpp
     src/parser.cpp
+    src/options.cpp
+    src/result_printer.cpp
+    src/application.cpp
 )
 target_include_directories(conjuctive_unary_library PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/CU
@@ -28,7 +31,7 @@ target_include_directories(conjuctive_unary_library PUBLIC
 )
 
 add_executable(gcu
-    example/main.cpp
+    src/main.cpp
 )
 target_link_libraries(gcu PRIVATE conjuctive_unary_library)
 
@@ -42,20 +45,16 @@ endif()
 
 enable_testing()
 
-add_executable(expressions_test
-    test/expressions_test.cpp
-)
-target_link_libraries(expressions_test PRIVATE conjuctive_unary_library)
-add_test(NAME expressions_test COMMAND expressions_test)
+# helper: creates executable test file from one .cpp,
+# links with library and register in CTest.
+function(add_project_test source)
+    get_filename_component(name "${source}" NAME_WE)
+    add_executable(${name} ${source})
+    target_link_libraries(${name} PRIVATE conjuctive_unary_library)
+    add_test(NAME ${name} COMMAND ${name})
+endfunction()
 
-add_executable(equation_calculator_test
-    test/equation_calculator_test.cpp
-)
-target_link_libraries(equation_calculator_test PRIVATE conjuctive_unary_library)
-add_test(NAME equation_calculator_test COMMAND equation_calculator_test)
-
-add_executable(parser_test
-    test/parser_test.cpp
-)
-target_link_libraries(parser_test PRIVATE conjuctive_unary_library)
-add_test(NAME parser_test COMMAND parser_test)
+add_project_test(test/parser_test.cpp)
+add_project_test(test/equation_calculator_test.cpp)
+add_project_test(test/expressions_test.cpp)
+add_project_test(test/application_test.cpp)
