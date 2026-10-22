@@ -2,9 +2,13 @@
 #define COMMON_HPP
 
 #include <cstddef>
+#include <cctype>
+#include <stdexcept>
 #include <memory>
 #include <set>
+#include <map>
 #include <utility>
+#include <string>
 #include <vector>
 
 /// Numeric type used for elements of the sets.

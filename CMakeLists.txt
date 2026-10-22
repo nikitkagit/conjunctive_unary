@@ -16,6 +16,9 @@ add_library(conjuctive_unary_library
     src/sum_expression.cpp
     src/union_expression.cpp
     src/variable_expression.cpp
+    src/expression_proxy.cpp
+    src/constant_expression.cpp
+    src/equation_calculator.cpp
 )
 target_include_directories(conjuctive_unary_library PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/CU
@@ -37,8 +40,14 @@ endif()
 
 enable_testing()
 
-add_executable(equation_test
-    test/equation_test.cpp
+add_executable(expressions_test
+    test/expressions_test.cpp
 )
-target_link_libraries(equation_test PRIVATE conjuctive_unary_library)
-add_test(NAME equation_test COMMAND equation_test)
+target_link_libraries(expressions_test PRIVATE conjuctive_unary_library)
+add_test(NAME expressions_test COMMAND expressions_test)
+
+add_executable(equation_calculator_test
+    test/equation_calculator_test.cpp
+)
+target_link_libraries(equation_calculator_test PRIVATE conjuctive_unary_library)
+add_test(NAME equation_calculator_test COMMAND equation_calculator_test)
