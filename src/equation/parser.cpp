@@ -1,14 +1,14 @@
-#include "equation/parser.hpp"
+#include "CU/equation/parser.hpp"
 
-#include "equation/equation.hpp"
-#include "equation/equation_calculator.hpp"
+#include "CU/equation/equation.hpp"
+#include "CU/equation/equation_calculator.hpp"
 
-#include "expression/constant_expression.hpp"
-#include "expression/expression_proxy.hpp"
-#include "expression/intersection_expression.hpp"
-#include "expression/sum_expression.hpp"
-#include "expression/union_expression.hpp"
-#include "expression/variable_expression.hpp"
+#include "CU/expression/constant_expression.hpp"
+#include "CU/expression/expression_proxy.hpp"
+#include "CU/expression/intersection_expression.hpp"
+#include "CU/expression/sum_expression.hpp"
+#include "CU/expression/union_expression.hpp"
+#include "CU/expression/variable_expression.hpp"
 
 Parser::Parser(EquationCalculator &calculator)
     : m_calculator(calculator)

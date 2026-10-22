@@ -1,5 +1,5 @@
-#include "expression/intersection_expression.hpp"
-#include "expression/expression_visitor.hpp"
+#include "CU/expression/intersection_expression.hpp"
+#include "CU/expression/expression_visitor.hpp"
 
 IntersectionExpression::IntersectionExpression(std::vector<std::unique_ptr<Expression>> operands)
     : m_operands(std::move(operands))

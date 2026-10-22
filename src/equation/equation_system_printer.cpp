@@ -1,10 +1,10 @@
-#include "equation/equation_system_printer.hpp"
+#include "CU/equation/equation_system_printer.hpp"
 
-#include "equation/equation.hpp"
-#include "equation/equation_calculator.hpp"
-#include "equation/variable_dictionary.hpp"
-#include "expression/expression_printer.hpp"
-#include "expression/variable_expression.hpp"
+#include "CU/equation/equation.hpp"
+#include "CU/equation/equation_calculator.hpp"
+#include "CU/equation/variable_dictionary.hpp"
+#include "CU/expression/expression_printer.hpp"
+#include "CU/expression/variable_expression.hpp"
 
 #include <fstream>
 #include <ostream>

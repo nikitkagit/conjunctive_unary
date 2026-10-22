@@ -1,7 +1,7 @@
-#include "equation/equation_calculator.hpp"
+#include "CU/equation/equation_calculator.hpp"
 
-#include "equation/equation.hpp"
-#include "expression/variable_expression.hpp"
+#include "CU/equation/equation.hpp"
+#include "CU/expression/variable_expression.hpp"
 
 EquationCalculator::EquationCalculator() = default;
 EquationCalculator::~EquationCalculator() = default;

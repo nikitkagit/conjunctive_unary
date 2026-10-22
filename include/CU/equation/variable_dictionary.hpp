@@ -1,7 +1,7 @@
 #ifndef VARIABLE_DICTIONARY_HPP
 #define VARIABLE_DICTIONARY_HPP
 
-#include "common.hpp"
+#include "CU/common.hpp"
 
 class EquationCalculator;
 class VariableExpression;

@@ -1,7 +1,7 @@
 #ifndef EXPRESSION_PROXY_HPP
 #define EXPRESSION_PROXY_HPP
 
-#include "expression.hpp"
+#include "CU/expression/expression.hpp"
 
 /**
  * @brief Proxy expression holding a non-owning pointer to another expression.

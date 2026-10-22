@@ -1,8 +1,7 @@
-// include/CU/result_printer.hpp
 #ifndef RESULT_PRINTER_HPP
 #define RESULT_PRINTER_HPP
 
-#include "common.hpp"
+#include "CU/common.hpp"
 
 #include <iosfwd>
 #include <string>

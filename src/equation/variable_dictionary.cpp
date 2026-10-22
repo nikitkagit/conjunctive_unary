@@ -1,7 +1,7 @@
-#include "equation/variable_dictionary.hpp"
+#include "CU/equation/variable_dictionary.hpp"
 
-#include "equation/equation_calculator.hpp"
-#include "expression/variable_expression.hpp"
+#include "CU/equation/equation_calculator.hpp"
+#include "CU/expression/variable_expression.hpp"
 
 VariableDictionary::VariableDictionary(EquationCalculator &calculator)
     : m_calculator(calculator)

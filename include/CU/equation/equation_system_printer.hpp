@@ -1,7 +1,7 @@
 #ifndef CU_APPLICATION_EQUATION_SYSTEM_PRINTER_HPP
 #define CU_APPLICATION_EQUATION_SYSTEM_PRINTER_HPP
 
-#include "common.hpp"
+#include "CU/common.hpp"
 
 class VariableDictionary;
 class EquationCalculator;

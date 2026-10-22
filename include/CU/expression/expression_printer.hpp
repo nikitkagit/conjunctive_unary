@@ -1,9 +1,9 @@
 #ifndef CU_EXPRESSION_PRINTER_HPP
 #define CU_EXPRESSION_PRINTER_HPP
 
-#include "common.hpp"
+#include "CU/common.hpp"
 
-#include "expression/expression_visitor.hpp"
+#include "CU/expression/expression_visitor.hpp"
 
 class Expression;
 class VariableExpression;

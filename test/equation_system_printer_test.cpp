@@ -5,9 +5,9 @@
 #include <sstream>
 #include <string>
 
-#include "equation/equation_calculator.hpp"
-#include "equation/equation_system_printer.hpp"
-#include "equation/parser.hpp"
+#include "CU/equation/equation_calculator.hpp"
+#include "CU/equation/equation_system_printer.hpp"
+#include "CU/equation/parser.hpp"
 
 namespace
 {

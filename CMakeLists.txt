@@ -52,7 +52,6 @@ add_library(conjunctive_unary_library
 
 target_include_directories(conjunctive_unary_library PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/CU
 )
 
 target_include_directories(conjunctive_unary_library PUBLIC

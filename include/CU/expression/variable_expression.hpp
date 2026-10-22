@@ -1,7 +1,7 @@
 #ifndef VARIABLE_EXPRESSION_HPP
 #define VARIABLE_EXPRESSION_HPP
 
-#include "expression.hpp"
+#include "CU/expression/expression.hpp"
 
 /**
  * @brief Variable expression holding a mutable set value.

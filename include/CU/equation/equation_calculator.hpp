@@ -1,7 +1,7 @@
 #ifndef EQUATION_CALCULATOR_HPP
 #define EQUATION_CALCULATOR_HPP
 
-#include "expression/expression.hpp"
+#include "CU/expression/expression.hpp"
 
 class VariableExpression;
 class Equation;

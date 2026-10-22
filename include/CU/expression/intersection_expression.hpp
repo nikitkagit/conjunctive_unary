@@ -1,7 +1,7 @@
 #ifndef INTERSECTION_EXPRESSION_HPP
 #define INTERSECTION_EXPRESSION_HPP
 
-#include "expression.hpp"
+#include "CU/expression/expression.hpp"
 
 /**
  * @brief Intersection of an arbitrary number of set expressions.

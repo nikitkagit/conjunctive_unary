@@ -1,7 +1,7 @@
-#include "application/result_printer.hpp"
+#include "CU/application/result_printer.hpp"
 
-#include "equation/variable_dictionary.hpp"
-#include "expression/variable_expression.hpp"
+#include "CU/equation/variable_dictionary.hpp"
+#include "CU/expression/variable_expression.hpp"
 
 #include <fstream>
 #include <ostream>

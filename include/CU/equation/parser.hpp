@@ -1,11 +1,11 @@
 #ifndef PARSER_HPP
 #define PARSER_HPP
 
-#include "common.hpp"
+#include "CU/common.hpp"
 
-#include "equation/variable_dictionary.hpp"
+#include "CU/equation/variable_dictionary.hpp"
 
-#include "expression/expression.hpp"
+#include "CU/expression/expression.hpp"
 
 class Equation;
 class EquationCalculator;

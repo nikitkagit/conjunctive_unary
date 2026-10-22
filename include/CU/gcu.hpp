@@ -1,9 +1,9 @@
 #ifndef GCU_HPP
 #define GCU_HPP
 
-#include "parser.hpp"
+#include "CU/equation/parser.hpp"
 
-#include "equation_calculator.hpp"
-#include "equation_system_printer.hpp
+#include "CU/equation/equation_calculator.hpp"
+#include "CU/equation/equation_system_printer.hpp
 
 #endif // GCU_HPP
