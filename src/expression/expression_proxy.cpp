@@ -1,4 +1,5 @@
 #include "expression/expression_proxy.hpp"
+#include "expression/expression_visitor.hpp"
 
 ExpressionProxy::ExpressionProxy(const Expression *target)
     : m_target(target)
@@ -18,4 +19,9 @@ void ExpressionProxy::set_target(const Expression *target)
 const Expression *ExpressionProxy::target() const
 {
     return m_target;
+}
+
+void ExpressionProxy::accept(ExpressionVisitor &visitor) const
+{
+    visitor.visit(*this);
 }

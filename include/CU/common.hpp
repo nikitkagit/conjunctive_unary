@@ -10,6 +10,9 @@
 #include <utility>
 #include <string>
 #include <vector>
+#include <functional>
+#include <sstream>
+#include <iosfwd>
 
 #include "types.hpp"
 

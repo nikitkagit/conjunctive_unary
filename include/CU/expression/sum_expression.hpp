@@ -23,6 +23,11 @@ public:
 
     data_t calculate() const override;
 
+    void accept(ExpressionVisitor &visitor) const override;
+
+    /// @brief Returns the operands owned by this expression.
+    const std::vector<std::unique_ptr<Expression>> &operands() const;
+
 private:
     std::vector<std::unique_ptr<Expression>> m_operands;
 };

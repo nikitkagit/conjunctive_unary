@@ -17,6 +17,8 @@ public:
 
     data_t calculate() const override;
 
+    void accept(ExpressionVisitor &visitor) const override;
+
 private:
     data_t m_value;
 };

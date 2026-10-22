@@ -23,6 +23,8 @@ public:
 
     data_t calculate() const override;
 
+    void accept(ExpressionVisitor &visitor) const override;
+
     /**
      * @brief Sets the current value of the variable.
      * @param data New value of the variable.

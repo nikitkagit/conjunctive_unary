@@ -45,6 +45,15 @@ public:
      */
     const data_t &data() const;
 
+    /**
+     * @brief Returns the target variable of the equation.
+     * @return Non-owning pointer to the target variable, or nullptr if none.
+     */
+    const VariableExpression *variable() const;
+
+    /// @brief Returns the expression owned by this equation.
+    const Expression &expression() const;
+
 private:
     std::unique_ptr<Expression> m_expression;
     VariableExpression *m_variable = nullptr;

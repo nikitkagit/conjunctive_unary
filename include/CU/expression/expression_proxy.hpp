@@ -34,6 +34,8 @@ public:
      */
     const Expression *target() const;
 
+    void accept(ExpressionVisitor &visitor) const override;
+
 private:
     const Expression *m_target = nullptr;
 };

@@ -1,4 +1,5 @@
 #include "expression/intersection_expression.hpp"
+#include "expression/expression_visitor.hpp"
 
 IntersectionExpression::IntersectionExpression(std::vector<std::unique_ptr<Expression>> operands)
     : m_operands(std::move(operands))
@@ -31,4 +32,14 @@ data_t IntersectionExpression::calculate() const
         }
     }
     return result;
+}
+
+void IntersectionExpression::accept(ExpressionVisitor &visitor) const
+{
+    visitor.visit(*this);
+}
+    
+const std::vector<std::unique_ptr<Expression>> &IntersectionExpression::operands() const
+{
+    return m_operands;
 }

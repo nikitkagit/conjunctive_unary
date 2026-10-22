@@ -30,3 +30,13 @@ const data_t &Equation::data() const
     static const data_t empty;
     return m_variable != nullptr ? m_variable->data() : empty;
 }
+
+const VariableExpression *Equation::variable() const
+{
+    return m_variable;
+}
+
+const Expression &Equation::expression() const
+{
+    return *m_expression;
+}

@@ -1,4 +1,5 @@
 #include "expression/sum_expression.hpp"
+#include "expression/expression_visitor.hpp"
 
 SumExpression::SumExpression(std::vector<std::unique_ptr<Expression>> operands)
     : m_operands(std::move(operands))
@@ -27,4 +28,14 @@ data_t SumExpression::calculate() const
         result = std::move(next);
     }
     return result;
+}
+
+void SumExpression::accept(ExpressionVisitor &visitor) const
+{
+    visitor.visit(*this);
+}
+    
+const std::vector<std::unique_ptr<Expression>> &SumExpression::operands() const
+{
+    return m_operands;
 }

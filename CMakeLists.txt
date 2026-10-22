@@ -39,6 +39,7 @@ add_library(conjunctive_unary_library
     src/equation/equation_calculator.cpp
     src/equation/parser.cpp
     src/equation/variable_dictionary.cpp
+    src/equation/equation_system_printer.cpp
 
     src/expression/intersection_expression.cpp
     src/expression/sum_expression.cpp
@@ -46,6 +47,7 @@ add_library(conjunctive_unary_library
     src/expression/variable_expression.cpp
     src/expression/expression_proxy.cpp
     src/expression/constant_expression.cpp
+    src/expression/expression_printer.cpp
 )
 
 target_include_directories(conjunctive_unary_library PRIVATE
@@ -99,6 +101,7 @@ if(CONJUNCTIVE_UNARY_BUILD_TESTS)
     add_project_test(test/equation_calculator_test.cpp)
     add_project_test(test/parser_test.cpp)
     add_project_test(test/application_test.cpp)
+    add_project_test(test/equation_system_printer_test.cpp)
 endif()
 
 # --- Install ---
