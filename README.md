@@ -175,7 +175,7 @@ Parsing is strict and fails on the first malformed line. Specifically:
 - **`VariableDictionary`** — bidirectional name ↔ variable map used by the parser and printer.
 - **`ResultPrinter`** — formats the final variable values and writes them to a file and/or stream.
 - **`Options`** — command-line option parsing.
-- **`Application`** — glue code tying everything together; `main()` just calls `Application::run()`.
+- **`SolverApp`** — glue code tying everything together; `main()` just calls `SolverApp::run()`.
 
 ## Testing
 

@@ -1,4 +1,4 @@
-#include "CU/application/options.hpp"
+#include "CU/solver_app/options.hpp"
 
 #include <ostream>
 #include <string>

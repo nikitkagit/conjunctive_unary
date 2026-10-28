@@ -1,9 +1,9 @@
 #include <iostream>
 
-#include "CU/application/application.hpp"
+#include "CU/solver_app/solver_app.hpp"
 
 int main(int argc, char **argv)
 {
-    Application app(std::cout, std::cerr);
+    SolverApp app(std::cout, std::cerr);
     return app.run(argc, argv);
 }

@@ -6,7 +6,7 @@
 #include <string>
 #include <vector>
 
-#include "CU/application/application.hpp"
+#include "CU/solver_app/solver_app.hpp"
 
 namespace
 {
@@ -34,7 +34,7 @@ int run_app(const std::vector<std::string> &args,
     {
         argv.push_back(const_cast<char *>(a.c_str()));
     }
-    Application app(out, err);
+    SolverApp app(out, err);
     return app.run(static_cast<int>(argv.size()), argv.data());
 }
 
@@ -205,6 +205,6 @@ int main()
         }
     }
 
-    std::cout << "All Application tests passed\n";
+    std::cout << "All SolverApp tests passed\n";
     return 0;
 }

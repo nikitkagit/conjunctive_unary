@@ -31,9 +31,9 @@ unset(_cu_tests_default)
 # --- Library target ---
 
 add_library(conjunctive_unary_library
-    src/application/application.cpp
-    src/application/options.cpp
-    src/application/result_printer.cpp
+    src/solver_app/solver_app.cpp
+    src/solver_app/options.cpp
+    src/solver_app/result_printer.cpp
 
     src/equation/equation.cpp
     src/equation/equation_calculator.cpp

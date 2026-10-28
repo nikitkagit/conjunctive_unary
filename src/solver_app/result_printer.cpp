@@ -1,4 +1,4 @@
-#include "CU/application/result_printer.hpp"
+#include "CU/solver_app/result_printer.hpp"
 
 #include "CU/equation/variable_dictionary.hpp"
 #include "CU/expression/variable_expression.hpp"

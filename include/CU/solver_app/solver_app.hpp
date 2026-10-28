@@ -1,5 +1,5 @@
-#ifndef APPLICATION_HPP
-#define APPLICATION_HPP
+#ifndef SOLVER_APP_HPP
+#define SOLVER_APP_HPP
 
 #include <iosfwd>
 
@@ -13,7 +13,7 @@ class Parser;
  * system via Parser, iterates EquationCalculator and prints the result to
  * the configured output file and to standard output.
  */
-class Application
+class SolverApp
 {
 public:
     /**
@@ -21,7 +21,7 @@ public:
      * @param out Stream for normal output (e.g. std::cout).
      * @param err Stream for error messages (e.g. std::cerr).
      */
-    Application(std::ostream &out, std::ostream &err);
+    SolverApp(std::ostream &out, std::ostream &err);
 
     /**
      * @brief Runs the application.
@@ -40,4 +40,4 @@ private:
     std::ostream &m_err;
 };
 
-#endif // APPLICATION_HPP
+#endif // SOLVER_APP_HPP
