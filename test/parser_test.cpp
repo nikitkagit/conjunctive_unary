@@ -9,27 +9,6 @@
 
 #include "CU/expression/variable_expression.hpp"
 
-namespace
-{
-template <typename Fn>
-bool throws_runtime_error(Fn &&fn)
-{
-    try
-    {
-        fn();
-    }
-    catch (const std::runtime_error &)
-    {
-        return true;
-    }
-    catch (...)
-    {
-        return false;
-    }
-    return false;
-}
-} // namespace
-
 int main()
 {
     // --- Basic assignment of a fixed set ---
@@ -38,6 +17,7 @@ int main()
         Parser parser(calc);
         Equation *eq = parser.parse_equation("A = {1, 2, 3}");
         assert(eq != nullptr);
+        assert(!parser.has_error());
         eq->calculate();
         assert((eq->data() == data_t{1, 2, 3}));
     }
@@ -47,6 +27,8 @@ int main()
         EquationCalculator calc;
         Parser parser(calc);
         Equation *eq = parser.parse_equation("A = {}");
+        assert(eq != nullptr);
+        assert(!parser.has_error());
         eq->calculate();
         assert(eq->data().empty());
     }
@@ -56,6 +38,8 @@ int main()
         EquationCalculator calc;
         Parser parser(calc);
         Equation *eq = parser.parse_equation("A = {1, 2} | {3, 4}");
+        assert(eq != nullptr);
+        assert(!parser.has_error());
         eq->calculate();
         assert((eq->data() == data_t{1, 2, 3, 4}));
     }
@@ -65,6 +49,8 @@ int main()
         EquationCalculator calc;
         Parser parser(calc);
         Equation *eq = parser.parse_equation("A = {1, 2, 3} & {2, 3, 4}");
+        assert(eq != nullptr);
+        assert(!parser.has_error());
         eq->calculate();
         assert((eq->data() == data_t{2, 3}));
     }
@@ -74,6 +60,8 @@ int main()
         EquationCalculator calc;
         Parser parser(calc);
         Equation *eq = parser.parse_equation("A = {1, 2} + {3, 4}");
+        assert(eq != nullptr);
+        assert(!parser.has_error());
         eq->calculate();
         assert((eq->data() == data_t{4, 5, 6}));
     }
@@ -84,6 +72,8 @@ int main()
         EquationCalculator calc;
         Parser parser(calc);
         Equation *eq = parser.parse_equation("A = {1, 2} + {3} & {3}");
+        assert(eq != nullptr);
+        assert(!parser.has_error());
         eq->calculate();
         assert((eq->data() == data_t{4, 5}));
     }
@@ -94,6 +84,8 @@ int main()
         EquationCalculator calc;
         Parser parser(calc);
         Equation *eq = parser.parse_equation("A = {1} + {2} | {3}");
+        assert(eq != nullptr);
+        assert(!parser.has_error());
         eq->calculate();
         assert((eq->data() == data_t{3}));
     }
@@ -104,6 +96,8 @@ int main()
         EquationCalculator calc;
         Parser parser(calc);
         Equation *eq = parser.parse_equation("A = {1, 2} | {3} & {3, 4}");
+        assert(eq != nullptr);
+        assert(!parser.has_error());
         eq->calculate();
         assert((eq->data() == data_t{1, 2, 3}));
     }
@@ -114,6 +108,8 @@ int main()
         EquationCalculator calc;
         Parser parser(calc);
         Equation *eq = parser.parse_equation("A = ({1, 2} | {3}) & {3, 4}");
+        assert(eq != nullptr);
+        assert(!parser.has_error());
         eq->calculate();
         assert((eq->data() == data_t{3}));
     }
@@ -123,6 +119,8 @@ int main()
         EquationCalculator calc;
         Parser parser(calc);
         Equation *eq = parser.parse_equation("A = (({1} + {2}) & {3})");
+        assert(eq != nullptr);
+        assert(!parser.has_error());
         eq->calculate();
         assert((eq->data() == data_t{3}));
     }
@@ -132,6 +130,8 @@ int main()
         EquationCalculator calc;
         Parser parser(calc);
         Equation *eq = parser.parse_equation("A = {1} | {2} | {3}");
+        assert(eq != nullptr);
+        assert(!parser.has_error());
         eq->calculate();
         assert((eq->data() == data_t{1, 2, 3}));
     }
@@ -139,6 +139,8 @@ int main()
         EquationCalculator calc;
         Parser parser(calc);
         Equation *eq = parser.parse_equation("A = {1, 2, 3} & {2, 3, 4} & {3, 4, 5}");
+        assert(eq != nullptr);
+        assert(!parser.has_error());
         eq->calculate();
         assert((eq->data() == data_t{3}));
     }
@@ -146,6 +148,8 @@ int main()
         EquationCalculator calc;
         Parser parser(calc);
         Equation *eq = parser.parse_equation("A = {1} + {2} + {3}");
+        assert(eq != nullptr);
+        assert(!parser.has_error());
         eq->calculate();
         assert((eq->data() == data_t{6}));
     }
@@ -156,6 +160,7 @@ int main()
         Parser parser(calc);
         Equation *eq = parser.parse_equation("A = {1}");
         assert(eq != nullptr);
+        assert(!parser.has_error());
         assert(calc.equations().size() == 1);
         assert(calc.equations().front().get() == eq);
     }
@@ -164,7 +169,9 @@ int main()
     {
         EquationCalculator calc;
         Parser parser(calc);
-        parser.parse_equation("A = {1}");
+        Equation *eq = parser.parse_equation("A = {1}");
+        assert(eq != nullptr);
+        assert(!parser.has_error());
         VariableExpression *a = parser.variables().find("A");
         assert(a != nullptr);
         assert(parser.variables().name_of(a) == "A");
@@ -174,8 +181,12 @@ int main()
     {
         EquationCalculator calc;
         Parser parser(calc);
-        parser.parse_equation("A = {1, 2}");
-        parser.parse_equation("B = {3}");
+        Equation *eq1 = parser.parse_equation("A = {1, 2}");
+        assert(eq1 != nullptr);
+        assert(!parser.has_error());
+        Equation *eq2 = parser.parse_equation("B = {3}");
+        assert(eq2 != nullptr);
+        assert(!parser.has_error());
         VariableExpression *a = parser.variables().find("A");
         VariableExpression *b = parser.variables().find("B");
         assert(a != nullptr);
@@ -188,8 +199,12 @@ int main()
     {
         EquationCalculator calc;
         Parser parser(calc);
-        parser.parse_equation("A = {1, 2}");
+        Equation *eq_a = parser.parse_equation("A = {1, 2}");
+        assert(eq_a != nullptr);
+        assert(!parser.has_error());
         Equation *eq = parser.parse_equation("B = A | {3}");
+        assert(eq != nullptr);
+        assert(!parser.has_error());
         calc.iterate();
         eq->calculate();
         assert((eq->data() == data_t{1, 2, 3}));
@@ -199,8 +214,12 @@ int main()
     {
         EquationCalculator calc;
         Parser parser(calc);
-        parser.parse_equation("A = {1, 2, 3}");
+        Equation *eq_a = parser.parse_equation("A = {1, 2, 3}");
+        assert(eq_a != nullptr);
+        assert(!parser.has_error());
         Equation *eq = parser.parse_equation("B = A & {2, 3, 4}");
+        assert(eq != nullptr);
+        assert(!parser.has_error());
         calc.iterate();
         eq->calculate();
         assert((eq->data() == data_t{2, 3}));
@@ -210,8 +229,12 @@ int main()
     {
         EquationCalculator calc;
         Parser parser(calc);
-        parser.parse_equation("A = {1, 2}");
+        Equation *eq_a = parser.parse_equation("A = {1, 2}");
+        assert(eq_a != nullptr);
+        assert(!parser.has_error());
         Equation *eq = parser.parse_equation("B = A & A");
+        assert(eq != nullptr);
+        assert(!parser.has_error());
         calc.iterate();
         eq->calculate();
         assert((eq->data() == data_t{1, 2}));
@@ -222,6 +245,8 @@ int main()
         EquationCalculator calc;
         Parser parser(calc);
         Equation *eq = parser.parse_equation("  A   =   { 1 , 2 , 3 }  ");
+        assert(eq != nullptr);
+        assert(!parser.has_error());
         eq->calculate();
         assert((eq->data() == data_t{1, 2, 3}));
     }
@@ -231,6 +256,8 @@ int main()
         EquationCalculator calc;
         Parser parser(calc);
         Equation *eq = parser.parse_equation("A = A | {1}");
+        assert(eq != nullptr);
+        assert(!parser.has_error());
         eq->calculate();
         assert((eq->data() == data_t{1}));
     }
@@ -239,8 +266,12 @@ int main()
     {
         EquationCalculator calc;
         Parser parser(calc);
-        parser.parse_equation("A = B | {1}");
-        parser.parse_equation("B = {2}");
+        Equation *eq_a = parser.parse_equation("A = B | {1}");
+        assert(eq_a != nullptr);
+        assert(!parser.has_error());
+        Equation *eq_b = parser.parse_equation("B = {2}");
+        assert(eq_b != nullptr);
+        assert(!parser.has_error());
         calc.iterate();
         calc.iterate();
         VariableExpression *a = parser.variables().find("A");
@@ -256,28 +287,74 @@ int main()
         EquationCalculator calc;
         Parser parser(calc);
 
-        assert(throws_runtime_error([&] { parser.parse_equation(""); }));
-        assert(throws_runtime_error([&] { parser.parse_equation("A"); }));
-        assert(throws_runtime_error([&] { parser.parse_equation("A ="); }));
-        assert(throws_runtime_error([&] { parser.parse_equation("= {1}"); }));
-        assert(throws_runtime_error([&] { parser.parse_equation("A = {1"); }));
-        assert(throws_runtime_error([&] { parser.parse_equation("A = {1, }"); }));
-        assert(throws_runtime_error([&] { parser.parse_equation("A = {1 2}"); }));
-        assert(throws_runtime_error([&] { parser.parse_equation("A = {x}"); }));
-        assert(throws_runtime_error([&] { parser.parse_equation("A = ( {1} "); } ));
-        assert(throws_runtime_error([&] { parser.parse_equation("A = & {1}"); }));
-        assert(throws_runtime_error([&] { parser.parse_equation("A = {1} extra"); }));
-        assert(throws_runtime_error([&] { parser.parse_equation("A = {1} +"); }));
-        assert(throws_runtime_error([&] { parser.parse_equation("A = {1} |"); }));
-        assert(throws_runtime_error([&] { parser.parse_equation("A = {1} &"); }));
-        assert(throws_runtime_error([&] { parser.parse_equation("A = ) "); }));
+        Equation *eq = parser.parse_equation("");
+        assert(eq == nullptr);
+        assert(parser.has_error());
+
+        eq = parser.parse_equation("A");
+        assert(eq == nullptr);
+        assert(parser.has_error());
+
+        eq = parser.parse_equation("A =");
+        assert(eq == nullptr);
+        assert(parser.has_error());
+
+        eq = parser.parse_equation("= {1}");
+        assert(eq == nullptr);
+        assert(parser.has_error());
+
+        eq = parser.parse_equation("A = {1");
+        assert(eq == nullptr);
+        assert(parser.has_error());
+
+        eq = parser.parse_equation("A = {1, }");
+        assert(eq == nullptr);
+        assert(parser.has_error());
+
+        eq = parser.parse_equation("A = {1 2}");
+        assert(eq == nullptr);
+        assert(parser.has_error());
+
+        eq = parser.parse_equation("A = {x}");
+        assert(eq == nullptr);
+        assert(parser.has_error());
+
+        eq = parser.parse_equation("A = ( {1} ");
+        assert(eq == nullptr);
+        assert(parser.has_error());
+
+        eq = parser.parse_equation("A = & {1}");
+        assert(eq == nullptr);
+        assert(parser.has_error());
+
+        eq = parser.parse_equation("A = {1} extra");
+        assert(eq == nullptr);
+        assert(parser.has_error());
+
+        eq = parser.parse_equation("A = {1} +");
+        assert(eq == nullptr);
+        assert(parser.has_error());
+
+        eq = parser.parse_equation("A = {1} |");
+        assert(eq == nullptr);
+        assert(parser.has_error());
+
+        eq = parser.parse_equation("A = {1} &");
+        assert(eq == nullptr);
+        assert(parser.has_error());
+
+        eq = parser.parse_equation("A = ) ");
+        assert(eq == nullptr);
+        assert(parser.has_error());
     }
 
     // --- Failed parse does not register an equation ---
     {
         EquationCalculator calc;
         Parser parser(calc);
-        assert(throws_runtime_error([&] { parser.parse_equation("A ="); }));
+        Equation *eq = parser.parse_equation("A =");
+        assert(eq == nullptr);
+        assert(parser.has_error());
         assert(calc.equations().empty());
     }
 
@@ -287,7 +364,9 @@ int main()
         // is created eagerly by the variable parser.
         EquationCalculator calc;
         Parser parser(calc);
-        assert(throws_runtime_error([&] { parser.parse_equation("A = B &"); }));
+        Equation *eq = parser.parse_equation("A = B &");
+        assert(eq == nullptr);
+        assert(parser.has_error());
         assert(parser.variables().find("A") == nullptr);
     }
 

@@ -26,21 +26,58 @@ const VariableDictionary &Parser::variables() const
     return m_variables;
 }
 
-Equation *Parser::parse_equation(const std::string &input)
+const std::string &Parser::error_message() const
+{
+    return m_error_message;
+}
+
+std::size_t Parser::error_position() const
+{
+    return m_error_position;
+}
+
+bool Parser::has_error() const
+{
+    return !m_error_message.empty();
+}
+
+void Parser::set_error(const std::string &message)
+{
+    m_error_message = message;
+    m_error_position = m_pos;
+}
+
+Equation * Parser::parse_equation(const std::string &input)
 {
     m_input = input;
     m_pos = 0;
+    m_error_message.clear();
+    m_error_position = 0;
 
     skip_whitespace();
     const std::string name = parse_identifier();
+    if (has_error())
+    {
+        return nullptr;
+    }
     skip_whitespace();
     expect('=');
+    if (has_error())
+    {
+        return nullptr;
+    }
 
     std::unique_ptr<Expression> root = parse_expression();
+    if (has_error())
+    {
+        return nullptr;
+    }
     skip_whitespace();
     if (!at_end())
     {
-        throw std::runtime_error("Unexpected trailing input in equation");
+        set_error("Unexpected trailing input: '"
+                  + m_input.substr(m_pos) + "'");
+        return nullptr;
     }
 
     VariableExpression *variable = m_variables.get_or_create(name);
@@ -52,6 +89,10 @@ Equation *Parser::parse_equation(const std::string &input)
 std::unique_ptr<Expression> Parser::parse_expression()
 {
     std::unique_ptr<Expression> first = parse_sum();
+    if (has_error())
+    {
+        return nullptr;
+    }
     skip_whitespace();
     if (at_end() || peek() != '|')
     {
@@ -69,7 +110,12 @@ std::unique_ptr<Expression> Parser::parse_expression()
             break;
         }
         next();
-        operands.push_back(parse_sum());
+        std::unique_ptr<Expression> operand = parse_sum();
+        if (has_error())
+        {
+            return nullptr;
+        }
+        operands.push_back(std::move(operand));
     }
 
     return std::make_unique<UnionExpression>(std::move(operands));
@@ -78,6 +124,10 @@ std::unique_ptr<Expression> Parser::parse_expression()
 std::unique_ptr<Expression> Parser::parse_sum()
 {
     std::unique_ptr<Expression> first = parse_intersection();
+    if (has_error())
+    {
+        return nullptr;
+    }
     skip_whitespace();
     if (at_end() || peek() != '+')
     {
@@ -95,7 +145,12 @@ std::unique_ptr<Expression> Parser::parse_sum()
             break;
         }
         next();
-        operands.push_back(parse_intersection());
+        std::unique_ptr<Expression> operand = parse_intersection();
+        if (has_error())
+        {
+            return nullptr;
+        }
+        operands.push_back(std::move(operand));
     }
 
     return std::make_unique<SumExpression>(std::move(operands));
@@ -104,6 +159,10 @@ std::unique_ptr<Expression> Parser::parse_sum()
 std::unique_ptr<Expression> Parser::parse_intersection()
 {
     std::unique_ptr<Expression> first = parse_primary();
+    if (has_error())
+    {
+        return nullptr;
+    }
     skip_whitespace();
     if (at_end() || peek() != '&')
     {
@@ -121,7 +180,12 @@ std::unique_ptr<Expression> Parser::parse_intersection()
             break;
         }
         next();
-        operands.push_back(parse_primary());
+        std::unique_ptr<Expression> operand = parse_primary();
+        if (has_error())
+        {
+            return nullptr;
+        }
+        operands.push_back(std::move(operand));
     }
 
     return std::make_unique<IntersectionExpression>(std::move(operands));
@@ -132,7 +196,8 @@ std::unique_ptr<Expression> Parser::parse_primary()
     skip_whitespace();
     if (at_end())
     {
-        throw std::runtime_error("Unexpected end of expression");
+        set_error("Unexpected end of expression");
+        return nullptr;
     }
 
     const char c = peek();
@@ -140,17 +205,33 @@ std::unique_ptr<Expression> Parser::parse_primary()
     {
         next();
         std::unique_ptr<Expression> inner = parse_expression();
+        if (has_error())
+        {
+            return nullptr;
+        }
         skip_whitespace();
         expect(')');
+        if (has_error())
+        {
+            return nullptr;
+        }
         return inner;
     }
     if (c == '{')
     {
         data_t value = parse_fixed_set();
+        if (has_error())
+        {
+            return nullptr;
+        }
         return std::make_unique<ConstantExpression>(std::move(value));
     }
 
     const std::string name = parse_identifier();
+    if (has_error())
+    {
+        return nullptr;
+    }
     VariableExpression *variable = m_variables.get_or_create(name);
     return std::make_unique<ExpressionProxy>(variable);
 }
@@ -177,9 +258,15 @@ bool Parser::match(char c)
 void Parser::expect(char c)
 {
     skip_whitespace();
-    if (at_end() || peek() != c)
+    if (at_end())
     {
-        throw std::runtime_error(std::string("Expected '") + c + "'");
+        set_error(std::string("Unexpected end of input, expected '") + c + "'");
+        return;
+    }
+    if (peek() != c)
+    {
+        set_error(std::string("Expected '") + c + "', got '" + peek() + "'");
+        return;
     }
     ++m_pos;
 }
@@ -202,10 +289,15 @@ bool Parser::at_end() const
 std::string Parser::parse_identifier()
 {
     skip_whitespace();
-    if (at_end() ||
-        !(std::isalpha(static_cast<unsigned char>(peek())) || peek() == '_'))
+    if (at_end())
     {
-        throw std::runtime_error("Expected identifier");
+        set_error("Expected identifier, got end of input");
+        return {};
+    }
+    if (!(std::isalpha(static_cast<unsigned char>(peek())) || peek() == '_'))
+    {
+        set_error(std::string("Expected identifier, got '") + peek() + "'");
+        return {};
     }
 
     std::string name;
@@ -227,9 +319,15 @@ std::string Parser::parse_identifier()
 num_t Parser::parse_number()
 {
     skip_whitespace();
-    if (at_end() || !std::isdigit(static_cast<unsigned char>(peek())))
+    if (at_end())
     {
-        throw std::runtime_error("Expected number");
+        set_error("Expected number, got end of input");
+        return 0;
+    }
+    if (!std::isdigit(static_cast<unsigned char>(peek())))
+    {
+        set_error(std::string("Expected number, got '") + peek() + "'");
+        return 0;
     }
 
     num_t value = 0;
@@ -243,6 +341,10 @@ num_t Parser::parse_number()
 data_t Parser::parse_fixed_set()
 {
     expect('{');
+    if (has_error())
+    {
+        return {};
+    }
 
     data_t result;
     skip_whitespace();
@@ -254,6 +356,10 @@ data_t Parser::parse_fixed_set()
     while (true)
     {
         const num_t value = parse_number();
+        if (has_error())
+        {
+            return {};
+        }
         result.insert(value);
         skip_whitespace();
         if (match('}'))
@@ -261,6 +367,10 @@ data_t Parser::parse_fixed_set()
             break;
         }
         expect(',');
+        if (has_error())
+        {
+            return {};
+        }
     }
     return result;
 }

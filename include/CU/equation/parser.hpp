@@ -1,14 +1,17 @@
-#ifndef PARSER_HPP
-#define PARSER_HPP
-
-#include "CU/common.hpp"
+#ifndef CU_EQUATION_PARSER_HPP
+#define CU_EQUATION_PARSER_HPP
 
 #include "CU/equation/variable_dictionary.hpp"
 
-#include "CU/expression/expression.hpp"
+#include "CU/expression/variable_expression.hpp"
+
+#include <memory>
+#include <optional>
+#include <string>
 
 class Equation;
 class EquationCalculator;
+class Expression;
 
 /**
  * @brief Parser for equations over sets of natural numbers.
@@ -46,9 +49,9 @@ public:
      * @brief Parses a single equation and registers it with the calculator.
      * @param input Source text of the equation.
      * @return Non-owning pointer to the created equation.
-     * @throws std::runtime_error on syntax errors.
+     * @return The parsed equation, or nullptr on syntax error.
      */
-    Equation *parse_equation(const std::string &input);
+    Equation * parse_equation(const std::string &input);
 
     /**
      * @brief Returns the owned variable dictionary.
@@ -61,6 +64,21 @@ public:
      * @return Const reference to the dictionary.
      */
     const VariableDictionary &variables() const;
+
+    /**
+     * @brief Returns the message describing the last parse error.
+     *
+     * Empty if no error has occurred since the last successful parse.
+     */
+    const std::string &error_message() const;
+
+    /**
+     * @brief Returns the input position where the last error occurred.
+     */
+    std::size_t error_position() const;
+
+    /// @brief True if the last parse attempt failed.
+    bool has_error() const;
 
 private:
     // Grammar productions, from lowest to highest precedence.
@@ -86,6 +104,14 @@ private:
     // Per-call parsing state.
     std::string m_input;
     std::size_t m_pos = 0;
+
+    /**
+     * @brief Records a parse error at the current input position.
+     */
+    void set_error(const std::string &message);
+
+    std::string m_error_message;
+    std::size_t m_error_position = 0;
 };
 
-#endif // PARSER_HPP
+#endif // CU_EQUATION_PARSER_HPP

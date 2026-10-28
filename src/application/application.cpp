@@ -78,14 +78,11 @@ bool Application::load_equations(const std::string &path,
             continue;
         }
 
-        try
-        {
-            parser.parse_equation(line);
-        }
-        catch (const std::exception &e)
+        Equation *equation = parser.parse_equation(line);
+        if (equation == nullptr || parser.has_error())
         {
             m_err << "Parse error on line " << line_number << ": "
-                  << e.what() << "\n";
+                  << parser.error_message() << "\n";
             return false;
         }
     }
