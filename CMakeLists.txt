@@ -48,6 +48,10 @@ add_library(conjunctive_unary_library
     src/expression/expression_proxy.cpp
     src/expression/constant_expression.cpp
     src/expression/expression_printer.cpp
+    
+    src/regular/regular_set.cpp
+    src/regular/regular_set_operations.cpp
+    src/regular/regular_set_printer.cpp
 )
 
 target_include_directories(conjunctive_unary_library PRIVATE
@@ -101,6 +105,7 @@ if(CONJUNCTIVE_UNARY_BUILD_TESTS)
     add_project_test(test/parser_test.cpp)
     add_project_test(test/application_test.cpp)
     add_project_test(test/equation_system_printer_test.cpp)
+    add_project_test(test/regular_set_test.cpp)
 endif()
 
 # --- Install ---
