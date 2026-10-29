@@ -46,7 +46,7 @@ add_library(conjunctive_unary_library
     src/expression/expression_proxy.cpp
     src/expression/constant_expression.cpp
     src/expression/expression_printer.cpp
-    src/expression/proxy_collector.cpp
+    src/expression/free_proxy_collector.cpp
     
     src/regular/regular_set.cpp
     src/regular/regular_set_operations.cpp

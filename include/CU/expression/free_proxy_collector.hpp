@@ -1,5 +1,5 @@
-#ifndef PROXY_COLLECTOR_HPP
-#define PROXY_COLLECTOR_HPP
+#ifndef FREE_PROXY_COLLECTOR_HPP
+#define FREE_PROXY_COLLECTOR_HPP
 
 #include "CU/expression/expression_visitor.hpp"
 
@@ -16,7 +16,7 @@ class ExpressionProxy;
  * not traversed: only the proxies that are structurally part of the visited
  * tree are reported.
  */
-class ProxyCollector : public ExpressionVisitor
+class FreeProxyCollector : public ExpressionVisitor
 {
 public:
     void visit(const ConstantExpression &expr) override;
@@ -36,4 +36,4 @@ private:
     std::vector<ExpressionProxy *> m_proxies;
 };
 
-#endif // PROXY_COLLECTOR_HPP
+#endif // FREE_PROXY_COLLECTOR_HPP
