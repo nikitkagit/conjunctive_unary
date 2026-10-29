@@ -4,13 +4,13 @@
 #include <iosfwd>
 
 class EquationCalculator;
-class Parser;
+class EquationParser;
 
 /**
  * @brief Encapsulates the top-level application logic.
  *
  * Parses command-line options, reads the input file, builds the equation
- * system via Parser, iterates EquationCalculator and prints the result to
+ * system via EquationParser, iterates EquationCalculator and prints the result to
  * the configured output file and to standard output.
  */
 class SolverApp
@@ -33,7 +33,7 @@ public:
 
 private:
     bool load_equations(const std::string &path,
-                        Parser &parser,
+                        EquationParser &parser,
                         EquationCalculator &calculator);
 
     std::ostream &m_out;

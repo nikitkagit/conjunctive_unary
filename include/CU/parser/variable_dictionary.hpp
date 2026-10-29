@@ -16,18 +16,7 @@ class VariableExpression;
 class VariableDictionary
 {
 public:
-    /**
-     * @brief Constructs a dictionary bound to the given calculator.
-     * @param calculator Calculator that owns the variables.
-     */
-    explicit VariableDictionary(EquationCalculator &calculator);
-
-    /**
-     * @brief Returns the variable with the given name, creating it if needed.
-     * @param name Variable name.
-     * @return Non-owning pointer to the variable.
-     */
-    VariableExpression *get_or_create(const std::string &name);
+    VariableDictionary() = default;
 
     /**
      * @brief Finds an existing variable by name.
@@ -35,6 +24,18 @@ public:
      * @return Non-owning pointer to the variable, or nullptr if not found.
      */
     VariableExpression *find(const std::string &name) const;
+
+    /**
+     * @brief Registers a variable under the given name.
+     *
+     * The dictionary does not take ownership. Registering a name that is
+     * already present replaces the previous mapping.
+     *
+     * @param name Variable name.
+     * @param variable Non-owning pointer to the variable.
+     */
+    void register_variable(const std::string &name,
+                           VariableExpression *variable);
 
     /**
      * @brief Returns the name of the given variable.
@@ -50,7 +51,6 @@ public:
     const std::map<std::string, VariableExpression *> &variables() const;
 
 private:
-    EquationCalculator &m_calculator;
     std::map<std::string, VariableExpression *> m_by_name;
     std::map<const VariableExpression *, std::string> m_by_variable;
 };

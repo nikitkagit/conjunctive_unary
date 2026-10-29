@@ -4,7 +4,9 @@
 #include "CU/solver_app/result_printer.hpp"
 
 #include "CU/equation/equation_calculator.hpp"
-#include "CU/equation/parser.hpp"
+
+#include "CU/parser/equation_parser.hpp"
+#include "CU/parser/variable_dictionary.hpp"
 
 #include <fstream>
 #include <string>
@@ -31,7 +33,8 @@ int SolverApp::run(int argc, char **argv)
     }
 
     EquationCalculator calculator;
-    Parser parser(calculator);
+    VariableDictionary dictionary;
+    EquationParser parser(dictionary);
 
     if (!load_equations(options.input_file(), parser, calculator))
     {
@@ -43,7 +46,7 @@ int SolverApp::run(int argc, char **argv)
         calculator.iterate();
     }
 
-    const ResultPrinter printer(parser.variables());
+    const ResultPrinter printer(dictionary);
     if (!printer.write_to_file(options.output_file()))
     {
         m_err << "Failed to write output file: " << options.output_file()
@@ -56,8 +59,8 @@ int SolverApp::run(int argc, char **argv)
 }
 
 bool SolverApp::load_equations(const std::string &path,
-                                 Parser &parser,
-                                 EquationCalculator & /*calculator*/)
+                                 EquationParser &parser,
+                                 EquationCalculator &calculator)
 {
     std::ifstream input(path);
     if (!input)
@@ -78,13 +81,18 @@ bool SolverApp::load_equations(const std::string &path,
             continue;
         }
 
-        Equation *equation = parser.parse_equation(line);
-        if (equation == nullptr || parser.has_error())
+        EquationParser::Result result = parser.parse_equation(line);
+        for (auto &variable : result.created_variables)
+        {
+            calculator.add_variable(std::move(variable));
+        }
+        if (result.equation == nullptr || parser.has_error())
         {
             m_err << "Parse error on line " << line_number << ": "
                   << parser.error_message() << "\n";
             return false;
         }
+        calculator.add_equation(std::move(result.equation));
     }
     return true;
 }

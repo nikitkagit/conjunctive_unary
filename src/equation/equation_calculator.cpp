@@ -20,6 +20,19 @@ Equation *EquationCalculator::add_equation(std::unique_ptr<Expression> expressio
     return m_equations.back().get();
 }
 
+VariableExpression *EquationCalculator::add_variable(
+    std::unique_ptr<VariableExpression> variable)
+{
+    m_variables.push_back(std::move(variable));
+    return m_variables.back().get();
+}
+
+Equation *EquationCalculator::add_equation(std::unique_ptr<Equation> equation)
+{
+    m_equations.push_back(std::move(equation));
+    return m_equations.back().get();
+}
+
 void EquationCalculator::iterate()
 {
     for (const auto &equation : m_equations)

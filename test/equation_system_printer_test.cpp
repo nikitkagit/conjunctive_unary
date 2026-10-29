@@ -4,14 +4,32 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <utility>
 
 #include "CU/equation/equation_calculator.hpp"
 #include "CU/equation/equation_system_printer.hpp"
-#include "CU/equation/parser.hpp"
+#include "CU/parser/equation_parser.hpp"
+#include "CU/parser/variable_dictionary.hpp"
 
 namespace
 {
-std::string render(Parser &parser, EquationCalculator &calculator)
+Equation *parse_eq(EquationParser &parser,
+                   EquationCalculator &calc,
+                   const std::string &input)
+{
+    EquationParser::Result result = parser.parse_equation(input);
+    for (auto &variable : result.created_variables)
+    {
+        calc.add_variable(std::move(variable));
+    }
+    if (result.equation == nullptr)
+    {
+        return nullptr;
+    }
+    return calc.add_equation(std::move(result.equation));
+}
+
+std::string render(EquationParser &parser, EquationCalculator &calculator)
 {
     EquationSystemPrinter printer(parser.variables(), calculator);
     return printer.format();
@@ -23,114 +41,125 @@ int main()
     // 1. Empty system prints nothing.
     {
         EquationCalculator calc;
-        Parser parser(calc);
+        VariableDictionary dictionary;
+        EquationParser parser(dictionary);
         assert(render(parser, calc).empty());
     }
 
     // 2. Constant expression at top level: no parentheses.
     {
         EquationCalculator calc;
-        Parser parser(calc);
-        parser.parse_equation("A = {1, 2, 3}");
+        VariableDictionary dictionary;
+        EquationParser parser(dictionary);
+        parse_eq(parser, calc, "A = {1, 2, 3}");
         assert(render(parser, calc) == "A = {1, 2, 3}\n");
     }
 
     // 3. Empty constant set.
     {
         EquationCalculator calc;
-        Parser parser(calc);
-        parser.parse_equation("A = {}");
+        VariableDictionary dictionary;
+        EquationParser parser(dictionary);
+        parse_eq(parser, calc, "A = {}");
         assert(render(parser, calc) == "A = {}\n");
     }
 
     // 4. Union at top level: no parentheses.
     {
         EquationCalculator calc;
-        Parser parser(calc);
-        parser.parse_equation("A = {1} | {2}");
+        VariableDictionary dictionary;
+        EquationParser parser(dictionary);
+        parse_eq(parser, calc, "A = {1} | {2}");
         assert(render(parser, calc) == "A = {1} | {2}\n");
     }
 
     // 5. Intersection at top level: no parentheses.
     {
         EquationCalculator calc;
-        Parser parser(calc);
-        parser.parse_equation("A = {1} & {2}");
+        VariableDictionary dictionary;
+        EquationParser parser(dictionary);
+        parse_eq(parser, calc, "A = {1} & {2}");
         assert(render(parser, calc) == "A = {1} & {2}\n");
     }
 
     // 6. Sum at top level: no parentheses.
     {
         EquationCalculator calc;
-        Parser parser(calc);
-        parser.parse_equation("A = {1} + {2}");
+        VariableDictionary dictionary;
+        EquationParser parser(dictionary);
+        parse_eq(parser, calc, "A = {1} + {2}");
         assert(render(parser, calc) == "A = {1} + {2}\n");
     }
 
     // 7. Sum of intersection: no parentheses, since & binds tighter.
     {
         EquationCalculator calc;
-        Parser parser(calc);
-        parser.parse_equation("A = {1} + {2} & {3}");
+        VariableDictionary dictionary;
+        EquationParser parser(dictionary);
+        parse_eq(parser, calc, "A = {1} + {2} & {3}");
         assert(render(parser, calc) == "A = {1} + {2} & {3}\n");
     }
 
-    // 8. Intersection of sum: sum is wrapped in parentheses (lower
-    //    precedence than &).
+    // 8. Intersection of sum: sum is wrapped in parentheses.
     {
         EquationCalculator calc;
-        Parser parser(calc);
-        parser.parse_equation("A = {1} & ({2} + {3})");
+        VariableDictionary dictionary;
+        EquationParser parser(dictionary);
+        parse_eq(parser, calc, "A = {1} & ({2} + {3})");
         assert(render(parser, calc) == "A = {1} & ({2} + {3})\n");
     }
 
     // 9. Union of sum: no parentheses, since + binds tighter than |.
     {
         EquationCalculator calc;
-        Parser parser(calc);
-        parser.parse_equation("A = {1} | {2} + {3}");
+        VariableDictionary dictionary;
+        EquationParser parser(dictionary);
+        parse_eq(parser, calc, "A = {1} | {2} + {3}");
         assert(render(parser, calc) == "A = {1} | {2} + {3}\n");
     }
 
     // 10. Sum of union: union needs parentheses.
     {
         EquationCalculator calc;
-        Parser parser(calc);
-        parser.parse_equation("A = {1} + ({2} | {3})");
+        VariableDictionary dictionary;
+        EquationParser parser(dictionary);
+        parse_eq(parser, calc, "A = {1} + ({2} | {3})");
         assert(render(parser, calc) == "A = {1} + ({2} | {3})\n");
     }
 
     // 11. Intersection of union: union needs parentheses.
     {
         EquationCalculator calc;
-        Parser parser(calc);
-        parser.parse_equation("A = {1} & ({2} | {3})");
+        VariableDictionary dictionary;
+        EquationParser parser(dictionary);
+        parse_eq(parser, calc, "A = {1} & ({2} | {3})");
         assert(render(parser, calc) == "A = {1} & ({2} | {3})\n");
     }
 
-    // 12. Motivating example: outer parentheses around the whole RHS are
-    //     not emitted, and the inner parentheses around (B & C) are also
-    //     dropped, because & binds tighter than |.
+    // 12. Redundant parentheses are dropped.
     {
         EquationCalculator calc;
-        Parser parser(calc);
-        parser.parse_equation("A = {1, 2, 3} | (B & C)");
+        VariableDictionary dictionary;
+        EquationParser parser(dictionary);
+        parse_eq(parser, calc, "A = {1, 2, 3} | (B & C)");
         assert(render(parser, calc) == "A = {1, 2, 3} | B & C\n");
     }
 
     // 13. Redundant parentheses in the source are dropped.
     {
         EquationCalculator calc;
-        Parser parser(calc);
-        parser.parse_equation("A = ({1} & {2})");
+        VariableDictionary dictionary;
+        EquationParser parser(dictionary);
+        parse_eq(parser, calc, "A = ({1} & {2})");
         assert(render(parser, calc) == "A = {1} & {2}\n");
     }
 
     // 14. Two unions under intersection keep both pairs of parentheses.
     {
         EquationCalculator calc;
-        Parser parser(calc);
-        parser.parse_equation("A = ({1} | {2}) & ({3} | {4})");
+        VariableDictionary dictionary;
+        EquationParser parser(dictionary);
+        parse_eq(parser, calc, "A = ({1} | {2}) & ({3} | {4})");
         assert(render(parser, calc) ==
                "A = ({1} | {2}) & ({3} | {4})\n");
     }
@@ -138,10 +167,11 @@ int main()
     // 15. Variable references are rendered by name.
     {
         EquationCalculator calc;
-        Parser parser(calc);
-        parser.parse_equation("A = {1}");
-        parser.parse_equation("B = A");
-        parser.parse_equation("C = A | B");
+        VariableDictionary dictionary;
+        EquationParser parser(dictionary);
+        parse_eq(parser, calc, "A = {1}");
+        parse_eq(parser, calc, "B = A");
+        parse_eq(parser, calc, "C = A | B");
         assert(render(parser, calc) ==
                "A = {1}\n"
                "B = A\n"
@@ -151,10 +181,11 @@ int main()
     // 16. Multiple equations are printed in insertion order.
     {
         EquationCalculator calc;
-        Parser parser(calc);
-        parser.parse_equation("A = {1}");
-        parser.parse_equation("B = A | {2}");
-        parser.parse_equation("C = B & {3}");
+        VariableDictionary dictionary;
+        EquationParser parser(dictionary);
+        parse_eq(parser, calc, "A = {1}");
+        parse_eq(parser, calc, "B = A | {2}");
+        parse_eq(parser, calc, "C = B & {3}");
         assert(render(parser, calc) ==
                "A = {1}\n"
                "B = A | {2}\n"
@@ -164,20 +195,18 @@ int main()
     // 17. Self-reference.
     {
         EquationCalculator calc;
-        Parser parser(calc);
-        parser.parse_equation("A = A | {1}");
+        VariableDictionary dictionary;
+        EquationParser parser(dictionary);
+        parse_eq(parser, calc, "A = A | {1}");
         assert(render(parser, calc) == "A = A | {1}\n");
     }
 
-    // 18. Alternating precedence in a deeper tree:
-    //     ({1} | {2}) + ({3} & ({4} | {5}))
-    //     - union under sum needs parens,
-    //     - intersection under sum does not,
-    //     - union under intersection needs parens.
+    // 18. Alternating precedence in a deeper tree.
     {
         EquationCalculator calc;
-        Parser parser(calc);
-        parser.parse_equation("A = ({1} | {2}) + ({3} & ({4} | {5}))");
+        VariableDictionary dictionary;
+        EquationParser parser(dictionary);
+        parse_eq(parser, calc, "A = ({1} | {2}) + ({3} & ({4} | {5}))");
         assert(render(parser, calc) ==
                "A = ({1} | {2}) + {3} & ({4} | {5})\n");
     }
@@ -186,22 +215,22 @@ int main()
     //     text.
     {
         EquationCalculator calc;
-        Parser parser(calc);
-        parser.parse_equation(
-            "A = {1, 2, 3} | (B & C)");
-        parser.parse_equation(
-            "B = (A + {1}) & {2, 3, 4, 5}");
+        VariableDictionary dictionary;
+        EquationParser parser(dictionary);
+        parse_eq(parser, calc, "A = {1, 2, 3} | (B & C)");
+        parse_eq(parser, calc, "B = (A + {1}) & {2, 3, 4, 5}");
         const std::string first = render(parser, calc);
 
         EquationCalculator calc2;
-        Parser parser2(calc2);
+        VariableDictionary dictionary2;
+        EquationParser parser2(dictionary2);
         std::istringstream lines(first);
         std::string line;
         while (std::getline(lines, line))
         {
             if (!line.empty())
             {
-                parser2.parse_equation(line);
+                parse_eq(parser2, calc2, line);
             }
         }
         assert(render(parser2, calc2) == first);
@@ -213,9 +242,10 @@ int main()
         std::remove(path);
 
         EquationCalculator calc;
-        Parser parser(calc);
-        parser.parse_equation("A = {1, 2}");
-        parser.parse_equation("B = A | {3}");
+        VariableDictionary dictionary;
+        EquationParser parser(dictionary);
+        parse_eq(parser, calc, "A = {1, 2}");
+        parse_eq(parser, calc, "B = A | {3}");
 
         EquationSystemPrinter printer(parser.variables(), calc);
         assert(printer.write_to_file(path));
@@ -234,8 +264,9 @@ int main()
     // 21. write_to_file to an invalid path returns false.
     {
         EquationCalculator calc;
-        Parser parser(calc);
-        parser.parse_equation("A = {1}");
+        VariableDictionary dictionary;
+        EquationParser parser(dictionary);
+        parse_eq(parser, calc, "A = {1}");
 
         EquationSystemPrinter printer(parser.variables(), calc);
         assert(!printer.write_to_file("no_such_dir_xyz/out.txt"));
@@ -244,9 +275,10 @@ int main()
     // 22. write() emits the same text as format().
     {
         EquationCalculator calc;
-        Parser parser(calc);
-        parser.parse_equation("A = {1} | {2}");
-        parser.parse_equation("B = {3} & {4}");
+        VariableDictionary dictionary;
+        EquationParser parser(dictionary);
+        parse_eq(parser, calc, "A = {1} | {2}");
+        parse_eq(parser, calc, "B = {3} & {4}");
 
         EquationSystemPrinter printer(parser.variables(), calc);
         std::ostringstream out;

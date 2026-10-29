@@ -169,7 +169,7 @@ Parsing is strict and fails on the first malformed line. Specifically:
 - **`ConstantExpression`**, **`UnionExpression`**, **`IntersectionExpression`**, **`SumExpression`** — concrete operations that own their operands.
 - **`VariableExpression`** — mutable named variable; the value is what the system converges to.
 - **`ExpressionProxy`** — non-owning wrapper used to break ownership cycles (e.g. `A = A | {1}`).
-- **`Parser`** — recursive-descent parser; builds an expression tree and registers a new `Equation` with the calculator.
+- **`EquationParser`** — recursive-descent parser; builds an expression tree and registers a new `Equation` with the calculator.
 - **`Equation`** — owns an expression and references a target variable; `calculate()` assigns the expression result to it.
 - **`EquationCalculator`** — owns all variables and equations; `iterate()` evaluates every equation once.
 - **`VariableDictionary`** — bidirectional name ↔ variable map used by the parser and printer.

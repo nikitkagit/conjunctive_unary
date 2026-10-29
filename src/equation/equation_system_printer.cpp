@@ -2,7 +2,7 @@
 
 #include "CU/equation/equation.hpp"
 #include "CU/equation/equation_calculator.hpp"
-#include "CU/equation/variable_dictionary.hpp"
+#include "CU/parser/variable_dictionary.hpp"
 #include "CU/expression/expression_printer.hpp"
 #include "CU/expression/variable_expression.hpp"
 

@@ -41,6 +41,20 @@ public:
      * @return Non-owning pointer to the created equation.
      */
     Equation *add_equation(std::unique_ptr<Expression> expression);
+
+    /**
+     * @brief Takes ownership of an already-created variable.
+     * @param variable Owning pointer to the variable.
+     * @return Non-owning pointer to the stored variable.
+     */
+    VariableExpression *add_variable(std::unique_ptr<VariableExpression> variable);
+
+    /**
+     * @brief Takes ownership of an already-created equation.
+     * @param equation Owning pointer to the equation.
+     * @return Non-owning pointer to the stored equation.
+     */
+    Equation *add_equation(std::unique_ptr<Equation> equation);
     
     /**
      * @brief Performs one iteration: calls calculate() on every equation.

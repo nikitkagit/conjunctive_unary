@@ -37,8 +37,6 @@ add_library(conjunctive_unary_library
 
     src/equation/equation.cpp
     src/equation/equation_calculator.cpp
-    src/equation/parser.cpp
-    src/equation/variable_dictionary.cpp
     src/equation/equation_system_printer.cpp
 
     src/expression/intersection_expression.cpp
@@ -48,10 +46,18 @@ add_library(conjunctive_unary_library
     src/expression/expression_proxy.cpp
     src/expression/constant_expression.cpp
     src/expression/expression_printer.cpp
+    src/expression/proxy_collector.cpp
     
     src/regular/regular_set.cpp
     src/regular/regular_set_operations.cpp
     src/regular/regular_set_printer.cpp
+
+    src/parser/parser_base.cpp
+    src/parser/equation_parser.cpp
+    src/parser/variable_dictionary.cpp
+    src/parser/expression_parser.cpp
+
+    src/utils/error_reporter.cpp
 )
 
 target_include_directories(conjunctive_unary_library PRIVATE
@@ -102,7 +108,7 @@ if(CONJUNCTIVE_UNARY_BUILD_TESTS)
 
     add_project_test(test/expressions_test.cpp)
     add_project_test(test/equation_calculator_test.cpp)
-    add_project_test(test/parser_test.cpp)
+    add_project_test(test/equation_parser_test.cpp)
     add_project_test(test/application_test.cpp)
     add_project_test(test/equation_system_printer_test.cpp)
     add_project_test(test/regular_set_test.cpp)

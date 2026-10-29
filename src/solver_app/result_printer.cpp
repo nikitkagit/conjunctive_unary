@@ -1,6 +1,6 @@
 #include "CU/solver_app/result_printer.hpp"
 
-#include "CU/equation/variable_dictionary.hpp"
+#include "CU/parser/variable_dictionary.hpp"
 #include "CU/expression/variable_expression.hpp"
 
 #include <fstream>

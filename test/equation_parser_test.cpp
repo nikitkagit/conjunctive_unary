@@ -1,21 +1,43 @@
 #include <iostream>
 #include <stdexcept>
 #include <string>
+#include <utility>
 #include <cassert>
 
 #include "CU/equation/equation.hpp"
 #include "CU/equation/equation_calculator.hpp"
-#include "CU/equation/parser.hpp"
+#include "CU/parser/equation_parser.hpp"
+#include "CU/parser/variable_dictionary.hpp"
 
 #include "CU/expression/variable_expression.hpp"
+
+namespace
+{
+Equation *parse_eq(EquationParser &parser,
+                   EquationCalculator &calc,
+                   const std::string &input)
+{
+    EquationParser::Result result = parser.parse_equation(input);
+    for (auto &variable : result.created_variables)
+    {
+        calc.add_variable(std::move(variable));
+    }
+    if (result.equation == nullptr)
+    {
+        return nullptr;
+    }
+    return calc.add_equation(std::move(result.equation));
+}
+} // namespace
 
 int main()
 {
     // --- Basic assignment of a fixed set ---
     {
         EquationCalculator calc;
-        Parser parser(calc);
-        Equation *eq = parser.parse_equation("A = {1, 2, 3}");
+        VariableDictionary dictionary;
+        EquationParser parser(dictionary);
+        Equation *eq = parse_eq(parser, calc, "A = {1, 2, 3}");
         assert(eq != nullptr);
         assert(!parser.has_error());
         eq->calculate();
@@ -25,8 +47,9 @@ int main()
     // --- Empty fixed set ---
     {
         EquationCalculator calc;
-        Parser parser(calc);
-        Equation *eq = parser.parse_equation("A = {}");
+        VariableDictionary dictionary;
+        EquationParser parser(dictionary);
+        Equation *eq = parse_eq(parser, calc, "A = {}");
         assert(eq != nullptr);
         assert(!parser.has_error());
         eq->calculate();
@@ -36,8 +59,9 @@ int main()
     // --- Union ---
     {
         EquationCalculator calc;
-        Parser parser(calc);
-        Equation *eq = parser.parse_equation("A = {1, 2} | {3, 4}");
+        VariableDictionary dictionary;
+        EquationParser parser(dictionary);
+        Equation *eq = parse_eq(parser, calc, "A = {1, 2} | {3, 4}");
         assert(eq != nullptr);
         assert(!parser.has_error());
         eq->calculate();
@@ -47,8 +71,9 @@ int main()
     // --- Intersection ---
     {
         EquationCalculator calc;
-        Parser parser(calc);
-        Equation *eq = parser.parse_equation("A = {1, 2, 3} & {2, 3, 4}");
+        VariableDictionary dictionary;
+        EquationParser parser(dictionary);
+        Equation *eq = parse_eq(parser, calc, "A = {1, 2, 3} & {2, 3, 4}");
         assert(eq != nullptr);
         assert(!parser.has_error());
         eq->calculate();
@@ -58,8 +83,9 @@ int main()
     // --- Pairwise sum ---
     {
         EquationCalculator calc;
-        Parser parser(calc);
-        Equation *eq = parser.parse_equation("A = {1, 2} + {3, 4}");
+        VariableDictionary dictionary;
+        EquationParser parser(dictionary);
+        Equation *eq = parse_eq(parser, calc, "A = {1, 2} + {3, 4}");
         assert(eq != nullptr);
         assert(!parser.has_error());
         eq->calculate();
@@ -68,10 +94,10 @@ int main()
 
     // --- Precedence: & > + ---
     {
-        // {1, 2} + ({3} & {3}) = {1, 2} + {3} = {4, 5}
         EquationCalculator calc;
-        Parser parser(calc);
-        Equation *eq = parser.parse_equation("A = {1, 2} + {3} & {3}");
+        VariableDictionary dictionary;
+        EquationParser parser(dictionary);
+        Equation *eq = parse_eq(parser, calc, "A = {1, 2} + {3} & {3}");
         assert(eq != nullptr);
         assert(!parser.has_error());
         eq->calculate();
@@ -80,10 +106,10 @@ int main()
 
     // --- Precedence: + > | ---
     {
-        // ({1} + {2}) | {3} = {3} | {3} = {3}
         EquationCalculator calc;
-        Parser parser(calc);
-        Equation *eq = parser.parse_equation("A = {1} + {2} | {3}");
+        VariableDictionary dictionary;
+        EquationParser parser(dictionary);
+        Equation *eq = parse_eq(parser, calc, "A = {1} + {2} | {3}");
         assert(eq != nullptr);
         assert(!parser.has_error());
         eq->calculate();
@@ -92,10 +118,10 @@ int main()
 
     // --- Precedence: | lowest, & highest ---
     {
-        // {1, 2} | ({3} & {3, 4}) = {1, 2} | {3} = {1, 2, 3}
         EquationCalculator calc;
-        Parser parser(calc);
-        Equation *eq = parser.parse_equation("A = {1, 2} | {3} & {3, 4}");
+        VariableDictionary dictionary;
+        EquationParser parser(dictionary);
+        Equation *eq = parse_eq(parser, calc, "A = {1, 2} | {3} & {3, 4}");
         assert(eq != nullptr);
         assert(!parser.has_error());
         eq->calculate();
@@ -104,10 +130,10 @@ int main()
 
     // --- Parentheses override precedence ---
     {
-        // ({1, 2} | {3}) & {3, 4} = {1, 2, 3} & {3, 4} = {3}
         EquationCalculator calc;
-        Parser parser(calc);
-        Equation *eq = parser.parse_equation("A = ({1, 2} | {3}) & {3, 4}");
+        VariableDictionary dictionary;
+        EquationParser parser(dictionary);
+        Equation *eq = parse_eq(parser, calc, "A = ({1, 2} | {3}) & {3, 4}");
         assert(eq != nullptr);
         assert(!parser.has_error());
         eq->calculate();
@@ -117,8 +143,9 @@ int main()
     // --- Nested parentheses ---
     {
         EquationCalculator calc;
-        Parser parser(calc);
-        Equation *eq = parser.parse_equation("A = (({1} + {2}) & {3})");
+        VariableDictionary dictionary;
+        EquationParser parser(dictionary);
+        Equation *eq = parse_eq(parser, calc, "A = (({1} + {2}) & {3})");
         assert(eq != nullptr);
         assert(!parser.has_error());
         eq->calculate();
@@ -128,8 +155,9 @@ int main()
     // --- Chained operators of the same kind ---
     {
         EquationCalculator calc;
-        Parser parser(calc);
-        Equation *eq = parser.parse_equation("A = {1} | {2} | {3}");
+        VariableDictionary dictionary;
+        EquationParser parser(dictionary);
+        Equation *eq = parse_eq(parser, calc, "A = {1} | {2} | {3}");
         assert(eq != nullptr);
         assert(!parser.has_error());
         eq->calculate();
@@ -137,8 +165,9 @@ int main()
     }
     {
         EquationCalculator calc;
-        Parser parser(calc);
-        Equation *eq = parser.parse_equation("A = {1, 2, 3} & {2, 3, 4} & {3, 4, 5}");
+        VariableDictionary dictionary;
+        EquationParser parser(dictionary);
+        Equation *eq = parse_eq(parser, calc, "A = {1, 2, 3} & {2, 3, 4} & {3, 4, 5}");
         assert(eq != nullptr);
         assert(!parser.has_error());
         eq->calculate();
@@ -146,8 +175,9 @@ int main()
     }
     {
         EquationCalculator calc;
-        Parser parser(calc);
-        Equation *eq = parser.parse_equation("A = {1} + {2} + {3}");
+        VariableDictionary dictionary;
+        EquationParser parser(dictionary);
+        Equation *eq = parse_eq(parser, calc, "A = {1} + {2} + {3}");
         assert(eq != nullptr);
         assert(!parser.has_error());
         eq->calculate();
@@ -157,8 +187,9 @@ int main()
     // --- Equation is registered in the calculator ---
     {
         EquationCalculator calc;
-        Parser parser(calc);
-        Equation *eq = parser.parse_equation("A = {1}");
+        VariableDictionary dictionary;
+        EquationParser parser(dictionary);
+        Equation *eq = parse_eq(parser, calc, "A = {1}");
         assert(eq != nullptr);
         assert(!parser.has_error());
         assert(calc.equations().size() == 1);
@@ -168,8 +199,9 @@ int main()
     // --- Unknown variable is created in dictionary ---
     {
         EquationCalculator calc;
-        Parser parser(calc);
-        Equation *eq = parser.parse_equation("A = {1}");
+        VariableDictionary dictionary;
+        EquationParser parser(dictionary);
+        Equation *eq = parse_eq(parser, calc, "A = {1}");
         assert(eq != nullptr);
         assert(!parser.has_error());
         VariableExpression *a = parser.variables().find("A");
@@ -180,11 +212,12 @@ int main()
     // --- Multiple equations share the dictionary ---
     {
         EquationCalculator calc;
-        Parser parser(calc);
-        Equation *eq1 = parser.parse_equation("A = {1, 2}");
+        VariableDictionary dictionary;
+        EquationParser parser(dictionary);
+        Equation *eq1 = parse_eq(parser, calc, "A = {1, 2}");
         assert(eq1 != nullptr);
         assert(!parser.has_error());
-        Equation *eq2 = parser.parse_equation("B = {3}");
+        Equation *eq2 = parse_eq(parser, calc, "B = {3}");
         assert(eq2 != nullptr);
         assert(!parser.has_error());
         VariableExpression *a = parser.variables().find("A");
@@ -198,11 +231,12 @@ int main()
     // --- Variable reference yields correct value after iteration ---
     {
         EquationCalculator calc;
-        Parser parser(calc);
-        Equation *eq_a = parser.parse_equation("A = {1, 2}");
+        VariableDictionary dictionary;
+        EquationParser parser(dictionary);
+        Equation *eq_a = parse_eq(parser, calc, "A = {1, 2}");
         assert(eq_a != nullptr);
         assert(!parser.has_error());
-        Equation *eq = parser.parse_equation("B = A | {3}");
+        Equation *eq = parse_eq(parser, calc, "B = A | {3}");
         assert(eq != nullptr);
         assert(!parser.has_error());
         calc.iterate();
@@ -213,11 +247,12 @@ int main()
     // --- Variable reference in intersection ---
     {
         EquationCalculator calc;
-        Parser parser(calc);
-        Equation *eq_a = parser.parse_equation("A = {1, 2, 3}");
+        VariableDictionary dictionary;
+        EquationParser parser(dictionary);
+        Equation *eq_a = parse_eq(parser, calc, "A = {1, 2, 3}");
         assert(eq_a != nullptr);
         assert(!parser.has_error());
-        Equation *eq = parser.parse_equation("B = A & {2, 3, 4}");
+        Equation *eq = parse_eq(parser, calc, "B = A & {2, 3, 4}");
         assert(eq != nullptr);
         assert(!parser.has_error());
         calc.iterate();
@@ -228,11 +263,12 @@ int main()
     // --- Same variable used twice in one expression ---
     {
         EquationCalculator calc;
-        Parser parser(calc);
-        Equation *eq_a = parser.parse_equation("A = {1, 2}");
+        VariableDictionary dictionary;
+        EquationParser parser(dictionary);
+        Equation *eq_a = parse_eq(parser, calc, "A = {1, 2}");
         assert(eq_a != nullptr);
         assert(!parser.has_error());
-        Equation *eq = parser.parse_equation("B = A & A");
+        Equation *eq = parse_eq(parser, calc, "B = A & A");
         assert(eq != nullptr);
         assert(!parser.has_error());
         calc.iterate();
@@ -243,8 +279,9 @@ int main()
     // --- Whitespace handling ---
     {
         EquationCalculator calc;
-        Parser parser(calc);
-        Equation *eq = parser.parse_equation("  A   =   { 1 , 2 , 3 }  ");
+        VariableDictionary dictionary;
+        EquationParser parser(dictionary);
+        Equation *eq = parse_eq(parser, calc, "  A   =   { 1 , 2 , 3 }  ");
         assert(eq != nullptr);
         assert(!parser.has_error());
         eq->calculate();
@@ -254,8 +291,9 @@ int main()
     // --- Self-reference does not crash ---
     {
         EquationCalculator calc;
-        Parser parser(calc);
-        Equation *eq = parser.parse_equation("A = A | {1}");
+        VariableDictionary dictionary;
+        EquationParser parser(dictionary);
+        Equation *eq = parse_eq(parser, calc, "A = A | {1}");
         assert(eq != nullptr);
         assert(!parser.has_error());
         eq->calculate();
@@ -265,11 +303,12 @@ int main()
     // --- Two mutually referencing equations ---
     {
         EquationCalculator calc;
-        Parser parser(calc);
-        Equation *eq_a = parser.parse_equation("A = B | {1}");
+        VariableDictionary dictionary;
+        EquationParser parser(dictionary);
+        Equation *eq_a = parse_eq(parser, calc, "A = B | {1}");
         assert(eq_a != nullptr);
         assert(!parser.has_error());
-        Equation *eq_b = parser.parse_equation("B = {2}");
+        Equation *eq_b = parse_eq(parser, calc, "B = {2}");
         assert(eq_b != nullptr);
         assert(!parser.has_error());
         calc.iterate();
@@ -285,65 +324,66 @@ int main()
     // --- Syntax errors ---
     {
         EquationCalculator calc;
-        Parser parser(calc);
+        VariableDictionary dictionary;
+        EquationParser parser(dictionary);
 
-        Equation *eq = parser.parse_equation("");
+        Equation *eq = parse_eq(parser, calc, "");
         assert(eq == nullptr);
         assert(parser.has_error());
 
-        eq = parser.parse_equation("A");
+        eq = parse_eq(parser, calc, "A");
         assert(eq == nullptr);
         assert(parser.has_error());
 
-        eq = parser.parse_equation("A =");
+        eq = parse_eq(parser, calc, "A =");
         assert(eq == nullptr);
         assert(parser.has_error());
 
-        eq = parser.parse_equation("= {1}");
+        eq = parse_eq(parser, calc, "= {1}");
         assert(eq == nullptr);
         assert(parser.has_error());
 
-        eq = parser.parse_equation("A = {1");
+        eq = parse_eq(parser, calc, "A = {1");
         assert(eq == nullptr);
         assert(parser.has_error());
 
-        eq = parser.parse_equation("A = {1, }");
+        eq = parse_eq(parser, calc, "A = {1, }");
         assert(eq == nullptr);
         assert(parser.has_error());
 
-        eq = parser.parse_equation("A = {1 2}");
+        eq = parse_eq(parser, calc, "A = {1 2}");
         assert(eq == nullptr);
         assert(parser.has_error());
 
-        eq = parser.parse_equation("A = {x}");
+        eq = parse_eq(parser, calc, "A = {x}");
         assert(eq == nullptr);
         assert(parser.has_error());
 
-        eq = parser.parse_equation("A = ( {1} ");
+        eq = parse_eq(parser, calc, "A = ( {1} ");
         assert(eq == nullptr);
         assert(parser.has_error());
 
-        eq = parser.parse_equation("A = & {1}");
+        eq = parse_eq(parser, calc, "A = & {1}");
         assert(eq == nullptr);
         assert(parser.has_error());
 
-        eq = parser.parse_equation("A = {1} extra");
+        eq = parse_eq(parser, calc, "A = {1} extra");
         assert(eq == nullptr);
         assert(parser.has_error());
 
-        eq = parser.parse_equation("A = {1} +");
+        eq = parse_eq(parser, calc, "A = {1} +");
         assert(eq == nullptr);
         assert(parser.has_error());
 
-        eq = parser.parse_equation("A = {1} |");
+        eq = parse_eq(parser, calc, "A = {1} |");
         assert(eq == nullptr);
         assert(parser.has_error());
 
-        eq = parser.parse_equation("A = {1} &");
+        eq = parse_eq(parser, calc, "A = {1} &");
         assert(eq == nullptr);
         assert(parser.has_error());
 
-        eq = parser.parse_equation("A = ) ");
+        eq = parse_eq(parser, calc, "A = ) ");
         assert(eq == nullptr);
         assert(parser.has_error());
     }
@@ -351,8 +391,9 @@ int main()
     // --- Failed parse does not register an equation ---
     {
         EquationCalculator calc;
-        Parser parser(calc);
-        Equation *eq = parser.parse_equation("A =");
+        VariableDictionary dictionary;
+        EquationParser parser(dictionary);
+        Equation *eq = parse_eq(parser, calc, "A =");
         assert(eq == nullptr);
         assert(parser.has_error());
         assert(calc.equations().empty());
@@ -360,16 +401,15 @@ int main()
 
     // --- Failed parse does not register the LHS variable ---
     {
-        // "A" is only created on successful parse; "B" inside the expression
-        // is created eagerly by the variable parser.
         EquationCalculator calc;
-        Parser parser(calc);
-        Equation *eq = parser.parse_equation("A = B &");
+        VariableDictionary dictionary;
+        EquationParser parser(dictionary);
+        Equation *eq = parse_eq(parser, calc, "A = B &");
         assert(eq == nullptr);
         assert(parser.has_error());
         assert(parser.variables().find("A") == nullptr);
     }
 
-    std::cout << "All Parser tests passed\n";
+    std::cout << "All EquationParser tests passed\n";
     return 0;
 }
